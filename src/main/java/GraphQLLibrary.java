@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.HttpResponse;
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
 
 public class GraphQLLibrary {
 
-    public static String queryGraphQLService(String url, String operation, String query)throws URISyntaxException,
-            IOException {
+    public static String queryGraphQLService(String url, String operation, String query) throws URISyntaxException,
+            IOException, GraphQLException {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
         URI uri = new URIBuilder(request.getURI())
@@ -36,7 +35,7 @@ public class GraphQLLibrary {
 
         final ObjectNode node = new ObjectMapper().readValue(actualResponse, ObjectNode.class);
         if(node.get("data") == null)
-            return node.toString();
+            throw new GraphQLException(node.toString());
 
         return node.get("data").get(operation).toString();
     }
